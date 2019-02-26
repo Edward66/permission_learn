@@ -2,9 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>用户登录</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/login.css">
 </head>
 <body>
+
+
+<div class="container login_main">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form action="{% url 'web:login' %}" method="post" novalidate>
+                {% csrf_token %}
+                {% for form in forms %}
+                    <div class="form-group">
+                        <label for="{{ form.auto_id }}">{{ form.label }}</label>
+                        {{ form }}
+                        <span class="error_info pull-right">{{ form.errors }}</span>
+                        <span class="error_info pull-right">{{ errors.0 }}</span>
+                    </div>
+                {% endfor %}
+                <input type="submit" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+
 
 </body>
 </html>
