@@ -1,4 +1,3 @@
-import re
 from collections import OrderedDict
 
 from django.template import Library
@@ -11,6 +10,8 @@ register = Library()
 def multi_menu(request):
     menu_dict = request.session[settings.MENU_SESSION_KEY]
 
+    print(request.current_selected_permission)
+
     # 对字典的key进行排序
     key_list = sorted(menu_dict)
 
@@ -19,10 +20,10 @@ def multi_menu(request):
     for key in key_list:
         val = menu_dict[key]
         val['class'] = 'hide'
-        for per in val['children']:
-            regex = "^%s$" % (per['url'])
-            if re.match(regex, request.path_info):
-                per['class'] = 'active'
+        for second_menu in val['children']:
+            # second_menu['id']和current_selected_permission存的都是当前点击的二级菜单的一级菜单的id
+            if second_menu['id'] == request.current_selected_permission:
+                second_menu['class'] = 'active'
                 val['class'] = ''
 
         ordered_dict[key] = val
