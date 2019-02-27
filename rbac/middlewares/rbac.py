@@ -1,7 +1,7 @@
 import re
 from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import HttpResponse
-from permission_learn import settings
+from django.conf import settings
 
 
 class RbacMiddleware(MiddlewareMixin):
