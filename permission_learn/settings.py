@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rbac.middlewares.rbac.RbacMiddleware',
 ]
 
 ROOT_URLCONF = 'permission_learn.urls'
@@ -121,3 +122,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+# 权限相关的配置
+PERMISSION_SESSION_KEY = 'permission_url_list_key'
+WHITE_LIST = ['/login/', '/admin/.*']
+NOT_LOG_IN = '未获取用户权限，请登录！'
+DENIED_INFO = "无权访问"
