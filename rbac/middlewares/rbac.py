@@ -27,13 +27,25 @@ class RbacMiddleware(MiddlewareMixin):
 
         flag = False
 
+        url_record = [
+            {'title': '首页', 'url': '#'}
+        ]
+
         for item in permission_list:
             reg = "^%s$" % item['url']
             if re.match(reg, current_url):
                 flag = True
-
-                # 如果是一级菜单，就是一级菜单的id，如果是二级菜单，也是一级菜单的id
-                request.current_selected_permission = item['pid'] or item['id']  # 前面为True就用前面的，前面为False就用后面的
+                request.current_selected_permission = item['pid'] or item['id']
+                if not item['pid']:
+                    url_record.extend([
+                        {'title': item['title'], 'url': item['url'], 'class': 'active'}
+                    ])
+                else:
+                    url_record.extend([
+                        {'title': item['p_title'], 'url': item['p_url']},
+                        {'title': item['title'], 'url': item['url'], 'class': 'active'},
+                    ])
+                request.breadcrumb = url_record
                 break
 
         if not flag:
