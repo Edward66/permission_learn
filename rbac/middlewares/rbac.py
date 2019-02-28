@@ -21,8 +21,8 @@ class RbacMiddleware(MiddlewareMixin):
             if re.match(valid_url, current_url):
                 # 白名单的url不用进行权限验证
                 return None
-        permission_list = request.session.get(settings.PERMISSION_SESSION_KEY)
-        if not permission_list:
+        permission_dict = request.session.get(settings.PERMISSION_SESSION_KEY)
+        if not permission_dict:
             return HttpResponse(settings.NOT_LOG_IN)
 
         flag = False
@@ -31,7 +31,7 @@ class RbacMiddleware(MiddlewareMixin):
             {'title': '首页', 'url': '#'}
         ]
 
-        for item in permission_list:
+        for item in permission_dict.values():
             reg = "^%s$" % item['url']
             if re.match(reg, current_url):
                 flag = True
