@@ -10,8 +10,6 @@ register = Library()
 def multi_menu(request):
     menu_dict = request.session[settings.MENU_SESSION_KEY]
 
-    print(request.current_selected_permission)
-
     # 对字典的key进行排序
     key_list = sorted(menu_dict)
 
@@ -28,3 +26,8 @@ def multi_menu(request):
 
         ordered_dict[key] = val
     return {'menu_dict': ordered_dict}
+
+
+@register.inclusion_tag('rbac/breadcrumb.html')
+def breadcrumb(request):
+    return {'record_list': request.breadcrumb}
