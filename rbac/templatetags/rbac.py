@@ -1,7 +1,11 @@
 from collections import OrderedDict
 
+from django.http import QueryDict
+from django.shortcuts import reverse
 from django.template import Library
 from django.conf import settings
+
+from rbac.service import urls
 
 register = Library()
 
@@ -33,7 +37,7 @@ def breadcrumb(request):
     return {'record_list': request.breadcrumb}
 
 
-@register.filter()
+@register.filter
 def has_permission(request, name):
     """
     判断是否有权限
@@ -44,3 +48,14 @@ def has_permission(request, name):
 
     if name in request.session[settings.PERMISSION_SESSION_KEY]:
         return True
+
+
+@register.simple_tag
+def memory_url(request, name, *args, **kwargs):
+    """
+    生成带有原搜索条件的URL（替代了模板中的url）
+    :param request:
+    :param name:
+    :return:
+    """
+    return urls.memory_url(request, name, *args, **kwargs)
