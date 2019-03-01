@@ -42,10 +42,65 @@
                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                 </a>
 
-                                <a style="color: red; font-size:18px" href="{% memory_url request 'rbac:menu_delete' pk=menu.id %}">
+                                <a style="color: red; font-size:18px"
+                                   href="{% memory_url request 'rbac:menu_delete' pk=menu.id %}">
                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
                                 </a>
                             </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">
+                    <i class="fa fa-flag" aria-hidden="true">二级菜单</i>
+
+                    {% if menu_id %}
+                        <a href="#" class="right btn btn-success btn-xs"
+                           style="padding: 2px 8px;margin:-3px">
+                            <i class="fa fa-plus-circle" aria-hidden="true">新建</i>
+                        </a>
+                    {% endif %}
+
+                </div>
+                <!-- Table -->
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>CODE&URL</th>
+                        <th>选项</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for second_menu in second_menus %}
+                        <!-- 管道符可以将后端传来的整型，转换成字符串 -->
+                        <tr class="{% if second_menu.id|safe == second_menu_id %}active{% endif %}">
+                            <td rowspan="2"><a
+                                    href="?mid={{ menu_id }}&sid={{ second_menu.id }}">{{ second_menu.title }}</a>
+                            </td>
+                            <td>{{ second_menu.name }}</td>
+                            <td>
+                                <a style="color: #333333; font-size:18px"
+                                   href="#">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </a>
+
+                                <a style="color: red; font-size:18px"
+                                   href="#">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr class="{% if second_menu.id|safe == second_menu_id %}active{% endif %}">
+                            <td colspan="2" style="border-top:0;">{{ second_menu.url }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

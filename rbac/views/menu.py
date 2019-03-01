@@ -12,12 +12,22 @@ def menu_list(request):
     :return:
     """
     menus = models.Menu.objects.all()
+    menu_id = request.GET.get('mid')  # 用户选择的一级菜单
+    second_menu_id = request.GET.get('sid')  # 用户选择的二级菜单
 
-    menu_id = request.GET.get('mid')  # "2"
+    menus_exists = models.Menu.objects.filter(id=menu_id).exists()
+    if not menus_exists:
+        menu_id = None
 
+    if menu_id:
+        second_menus = models.Permission.objects.filter(menu_id=menu_id)
+    else:
+        second_menus = []
     context = {
         'menus': menus,
         'menu_id': menu_id,
+        'second_menus': second_menus,
+        'second_menu_id': second_menu_id,
     }
     return render(request, 'rbac/menu_list.html', context)
 
