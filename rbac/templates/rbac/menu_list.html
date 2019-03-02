@@ -91,12 +91,12 @@
                             <td>{{ second_menu.name }}</td>
                             <td>
                                 <a style="color: #333333; font-size:18px"
-                                   href="{% memory_url request 'rbac:second_menu_edit' pk=menu_id %}">
+                                   href="{% memory_url request 'rbac:second_menu_edit' pk=second_menu.id %}">
                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                 </a>
 
                                 <a style="color: red; font-size:18px"
-                                   href="{% memory_url request 'rbac:second_menu_delete' pk=menu_id %}">
+                                   href="{% memory_url request 'rbac:second_menu_delete' pk=second_menu.id %}">
                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
                                 </a>
                             </td>

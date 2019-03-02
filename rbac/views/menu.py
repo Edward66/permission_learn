@@ -149,6 +149,6 @@ def second_menu_delete(request, pk):
     if request.method == 'GET':
         return render(request, 'rbac/delete.html', {'cancel': url})
 
-    models.Permission.objects.first(id=pk).delete()
+    models.Permission.objects.filter(id=pk).delete()
 
     return redirect(url)
