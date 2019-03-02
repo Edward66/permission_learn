@@ -11,6 +11,8 @@
 
 {% block content %}
     <div class="luffy-container">
+
+        <!-- 一级菜单 -->
         <div class="col-md-3">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
@@ -54,7 +56,7 @@
             </div>
         </div>
 
-
+        <!-- 二级菜单-->
         <div class="col-md-4">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
@@ -108,6 +110,64 @@
                 </table>
             </div>
         </div>
+
+        <!-- 权限表 -->
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">
+                    <i class="fa fa-flag" aria-hidden="true">权限</i>
+
+                    {% if menu_id %}
+
+                        {% if second_menu_id %}
+                            <a href="#"
+                               class="right btn btn-success btn-xs"
+                               style="padding: 2px 8px;margin:-3px">
+                                <i class="fa fa-plus-circle" aria-hidden="true">新建</i>
+                            </a>
+                        {% endif %}
+
+                    {% endif %}
+
+                </div>
+                <!-- Table -->
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>CODE&URL</th>
+                        <th>选项</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for permission in permissions %}
+                        <!-- 管道符可以将后端传来的整型，转换成字符串 -->
+                        <tr class="">
+                            <td rowspan="2">{{ permission.title }}</td>
+                            <td>{{ permission.name }}</td>
+                            <td>
+                                <a style="color: #333333; font-size:18px"
+                                   href="">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </a>
+
+                                <a style="color: red; font-size:18px"
+                                   href="">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr class="">
+                            <td colspan="2" style="border-top:0;">{{ second_menu.url }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
 

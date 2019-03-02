@@ -23,11 +23,22 @@ def menu_list(request):
         second_menus = models.Permission.objects.filter(menu_id=menu_id)
     else:
         second_menus = []
+
+    if second_menu_id:
+        permissions = models.Permission.objects.filter(pid__id=second_menu_id)
+    else:
+        permissions = []
+
+    second_menus_exists = models.Permission.objects.filter(id=second_menu_id).exists()
+    if not second_menus_exists:
+        second_menu_id = None
+
     context = {
         'menus': menus,
         'menu_id': menu_id,
         'second_menus': second_menus,
         'second_menu_id': second_menu_id,
+        'permissions': permissions,
     }
     return render(request, 'rbac/menu_list.html', context)
 
