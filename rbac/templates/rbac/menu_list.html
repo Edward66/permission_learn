@@ -121,7 +121,7 @@
                     {% if menu_id %}
 
                         {% if second_menu_id %}
-                            <a href="#"
+                            <a href="{% memory_url request 'rbac:permission_add' second_menu_id=second_menu_id %}"
                                class="right btn btn-success btn-xs"
                                style="padding: 2px 8px;margin:-3px">
                                 <i class="fa fa-plus-circle" aria-hidden="true">新建</i>
@@ -148,12 +148,12 @@
                             <td>{{ permission.name }}</td>
                             <td>
                                 <a style="color: #333333; font-size:18px"
-                                   href="">
+                                   href="{% memory_url request 'rbac:permission_edit' pk=permission.id %}">
                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                 </a>
 
                                 <a style="color: red; font-size:18px"
-                                   href="">
+                                   href="{% memory_url request 'rbac:permission_delete' pk=permission.id %}">
                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
                                 </a>
                             </td>

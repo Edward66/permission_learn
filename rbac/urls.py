@@ -25,8 +25,12 @@ urlpatterns = [
     re_path(r'^menu/delete/(?P<pk>\d+)/$', menu.menu_delete, name='menu_delete'),
 
     # 权限分配的二级菜单
-    # 权限分配之一级菜单
     re_path(r'^second/menu/add/(?P<menu_id>\d+)$', menu.second_menu_add, name='second_menu_add'),
     re_path(r'^second/menu/edit/(?P<pk>\d+)/$', menu.second_menu_edit, name='second_menu_edit'),
-    re_path(r'^second/menu/delete/(?P<pk>\d+)/$', menu.second_menu_delete, name='second_menu_delete')
+    re_path(r'^second/menu/delete/(?P<pk>\d+)/$', menu.second_menu_delete, name='second_menu_delete'),
+
+    # 权限分配的三级菜单（具体权限）
+    re_path(r'^permission/add/(?P<second_menu_id>\d+)', menu.permission_add, name='permission_add'),
+    re_path(r'^permission/edit/(?P<pk>\d+)', menu.permission_edit, name='permission_edit'),
+    re_path(r'^permission/delete/(?P<pk>\d+)', menu.permission_delete, name='permission_delete'),
 ]
