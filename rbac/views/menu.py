@@ -1,7 +1,7 @@
 from django.shortcuts import HttpResponse, render, redirect, reverse
 
 from rbac import models
-from rbac.forms.menu import MenuModelForm
+from rbac.forms.menu import MenuModelForm, SecondMenuModelForm
 from rbac.service.urls import memory_reverse
 
 
@@ -82,5 +82,62 @@ def menu_delete(request, pk):
         return render(request, 'rbac/delete.html', {'cancel': url})
 
     models.Menu.objects.filter(id=pk).delete()
+
+    return redirect(url)
+
+
+def second_menu_add(request, menu_id):
+    """
+    添加二级菜单
+    :param request:
+    :param menu_id: 已经选择的一级菜单ID（用于设置默认值）
+    :return:
+    """
+    menu_obj = models.Menu.objects.filter(id=menu_id).first()
+
+    if request.method == 'GET':
+        form = SecondMenuModelForm(initial={'menu': menu_obj})
+        return render(request, 'rbac/change.html', {'form': form})
+    form = SecondMenuModelForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        url = memory_reverse(request, 'rbac:menu_list')
+        return redirect(url)
+    return render(request, 'rbac/change.html', {'form': form})
+
+
+def second_menu_edit(request, pk):
+    """
+    编辑二级菜单
+    :param request:
+    :param menu_id:
+    :return:
+    """
+    permission_obj = models.Permission.objects.filter(id=pk).first()
+
+    if request.method == 'GET':
+        form = SecondMenuModelForm(instance=permission_obj)
+        return render(request, 'rbac/change.html', {'form': form})
+
+    form = SecondMenuModelForm(data=request.POST, instance=permission_obj)
+    if form.is_valid():
+        form.save()
+        url = memory_reverse(request, 'rbac:menu_list')
+        return redirect(url)
+    return render(request, 'rbac/change.html', {'form': form})
+
+
+def second_menu_delete(request, pk):
+    """
+    删除二级菜单
+    :param request:
+    :param pk:
+    :return:
+    """
+    url = memory_reverse(request, 'rbac:menu_list')
+    if request.method == 'GET':
+        return render(request, 'rbac/delete.html', {'cancel': url})
+
+    models.Permission.objects.first(id=pk).delete()
 
     return redirect(url)

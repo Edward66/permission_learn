@@ -1,9 +1,10 @@
 from django import forms
 
 from rbac import models
+from rbac.forms.base import BootStrapModelForm
 
 
-class UserModelForm(forms.ModelForm):
+class UserModelForm(BootStrapModelForm):
     confirm_password = forms.CharField(
         label='确认密码',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -12,12 +13,6 @@ class UserModelForm(forms.ModelForm):
     class Meta:
         model = models.UserInfo
         fields = ['name', 'email', 'password', 'confirm_password']
-
-    def __init__(self, *args, **kwargs):
-        super(UserModelForm, self).__init__(*args, **kwargs)
-        # 统一给ModelForm生成字段添加样式
-        for name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
 
     def clean_confirm_password(self):
         """
@@ -34,18 +29,13 @@ class UserModelForm(forms.ModelForm):
                 return confirm_paassword
 
 
-class UpdateUserModelForm(forms.ModelForm):
+class UpdateUserModelForm(BootStrapModelForm):
     class Meta:
         model = models.UserInfo
         fields = ['name', 'email']
 
-    def __init__(self, *args, **kwargs):
-        super(UpdateUserModelForm, self).__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
 
-
-class ResetPwdUserModelForm(forms.ModelForm):
+class ResetPwdUserModelForm(BootStrapModelForm):
     confirm_password = forms.CharField(
         label='确认密码',
         widget=forms.TextInput(attrs={'class': 'form-control'}),
@@ -54,11 +44,6 @@ class ResetPwdUserModelForm(forms.ModelForm):
     class Meta:
         model = models.UserInfo
         fields = ['password', 'confirm_password']
-
-    def __init__(self, *args, **kwargs):
-        super(ResetPwdUserModelForm, self).__init__(*args, **kwargs)
-        for name, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
 
     def clean_confirm_password(self):
         """

@@ -62,7 +62,8 @@
                     <i class="fa fa-flag" aria-hidden="true">二级菜单</i>
 
                     {% if menu_id %}
-                        <a href="#" class="right btn btn-success btn-xs"
+                        <a href="{% memory_url request 'rbac:second_menu_add' menu_id=menu_id %}"
+                           class="right btn btn-success btn-xs"
                            style="padding: 2px 8px;margin:-3px">
                             <i class="fa fa-plus-circle" aria-hidden="true">新建</i>
                         </a>
@@ -88,12 +89,12 @@
                             <td>{{ second_menu.name }}</td>
                             <td>
                                 <a style="color: #333333; font-size:18px"
-                                   href="#">
+                                   href="{% memory_url request 'rbac:second_menu_edit' pk=menu_id %}">
                                     <i class="fa fa-edit" aria-hidden="true"></i>
                                 </a>
 
                                 <a style="color: red; font-size:18px"
-                                   href="#">
+                                   href="{% memory_url request 'rbac:second_menu_delete' pk=menu_id %}">
                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
                                 </a>
                             </td>

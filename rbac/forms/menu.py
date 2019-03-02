@@ -2,6 +2,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 
 from rbac import models
+from rbac.forms.base import BootStrapModelForm
 
 ICON_LIST = [
     ['fa-hand-scissors-o', '<i aria-hidden="true" class="fa fa-hand-scissors-o"></i>'],
@@ -36,6 +37,7 @@ ICON_LIST = [
     ['fa-reply-all', '<i aria-hidden="true" class="fa fa-reply-all"></i>'],
     ['fa-retweet', '<i aria-hidden="true" class="fa fa-retweet"></i>'],
     ['fa-wrench', '<i aria-hidden="true" class="fa fa-wrench"></i>']]
+
 for item in ICON_LIST:
     item[1] = mark_safe(item[1])
 
@@ -51,3 +53,9 @@ class MenuModelForm(forms.ModelForm):
                 attrs={'class': 'clearfix'}
             )
         }
+
+
+class SecondMenuModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Permission
+        exclude = ['pid']

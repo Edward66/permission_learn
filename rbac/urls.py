@@ -18,8 +18,15 @@ urlpatterns = [
     re_path(r'^user/delele/(?P<pk>\d+)/$', user.user_delele, name='user_delete'),
     re_path(r'^user/reset/password/(?P<pk>\d+)$', user.user_reset_pwd, name='user_reset_pwd'),
 
+    # 权限分配的一级菜单
     re_path(r'^menu/list/$', menu.menu_list, name='menu_list'),
     re_path(r'^menu/add/$', menu.menu_add, name='menu_add'),
     re_path(r'^menu/edit/(?P<pk>\d+)/$', menu.menu_edit, name='menu_edit'),
-    re_path(r'^menu/delete/(?P<pk>\d+)/$', menu.menu_delete, name='menu_delete')
+    re_path(r'^menu/delete/(?P<pk>\d+)/$', menu.menu_delete, name='menu_delete'),
+
+    # 权限分配的二级菜单
+    # 权限分配之一级菜单
+    re_path(r'^second/menu/add/(?P<menu_id>\d+)$', menu.second_menu_add, name='second_menu_add'),
+    re_path(r'^second/menu/edit/(?P<pk>\d+)/$', menu.second_menu_edit, name='second_menu_edit'),
+    re_path(r'^second/menu/delete/(?P<pk>\d+)/$', menu.second_menu_delete, name='second_menu_delete')
 ]
