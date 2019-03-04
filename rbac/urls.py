@@ -36,4 +36,5 @@ urlpatterns = [
 
     # 批量操作权限
     re_path(r'^multi/permissions/$', menu.multi_permissions, name='multi_permissions'),  # 自动发现项目中的所有URL
+    re_path(r'^multi/permissions/delelte/(?P<pk>\d+)/$',menu.multi_permissions_delete,name='multi_permissions_delete'),
 ]

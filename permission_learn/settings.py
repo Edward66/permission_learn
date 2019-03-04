@@ -132,5 +132,7 @@ DENIED_INFO = "无权访问"
 
 AUTO_DISCOVER_EXCLUDE = [
     '/admin.*',
-    '/login/'
+    '/login/',
+    '/customer/.*',
+    '/payment/.*'
 ]
