@@ -33,4 +33,7 @@ urlpatterns = [
     re_path(r'^permission/add/(?P<second_menu_id>\d+)', menu.permission_add, name='permission_add'),
     re_path(r'^permission/edit/(?P<pk>\d+)', menu.permission_edit, name='permission_edit'),
     re_path(r'^permission/delete/(?P<pk>\d+)', menu.permission_delete, name='permission_delete'),
+
+    # 批量操作权限
+    re_path(r'^multi/permissions/$', menu.multi_permissions, name='multi_permissions'),  # 自动发现项目中的所有URL
 ]

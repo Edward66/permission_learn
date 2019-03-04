@@ -129,3 +129,8 @@ MENU_SESSION_KEY = 'permission_menu_key'
 WHITE_LIST = ['/login/', '/admin/.*']
 NOT_LOG_IN = '未获取用户权限，请登录！'
 DENIED_INFO = "无权访问"
+
+AUTO_DISCOVER_EXCLUDE = [
+    '/admin.*',
+    '/login/'
+]
