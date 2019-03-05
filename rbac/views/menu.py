@@ -353,3 +353,105 @@ def multi_permissions_delete(request, pk):
         return render(request, 'rbac/delete.html', {'cancel': url})
     models.Permission.objects.filter(id=pk).delete()
     return redirect(url)
+
+
+def distribute_permissions(request):
+    """
+    权限分配
+    :param request:
+    :return:
+    """
+    user_list = models.UserInfo.objects.all()
+    all_role_list = models.Role.objects.all()
+
+    menu_permission_list = []
+
+    # 所有的一级菜单
+    all_menu_list = models.Menu.objects.all().values('id', 'title')
+    """
+    [
+        {id:1, title:菜单1，children:[{id:1, title:x1, menu_id:1,children:[{id:11,title:11,pid:1},]]} ,{id:2, title:x2, menu_id:1,children:[]}},]}
+        {id:2, title:菜单2，children:[{id:3, title:x3, menu_id:2,children:[]} ,{id:4, title:x2, menu_id:1},children:[]},]}
+    ]
+    """
+    all_menu_dict = {}
+    """
+        {
+            1:{id:1,title:菜单1,children:[{id:1,title:x1,menu_id:1:children[{id:11,title:11,pid:1},],},{id:2, title:x2, menu_id:1,chidlren:[]}]},
+            1:{id:2,title:菜单2,children:[{id:3,title:x3,menu_id:2,:children:[]},{id:4, title:x4, menu_id:2}:children:[]]},
+            ......
+        }
+    """
+    for item in all_menu_list:
+        item['children'] = []  # 用于放二级菜单
+        all_menu_dict[item['id']] = item
+
+    # 所有的二级菜单
+    all_second_menu_list = models.Permission.objects.filter(menu__isnull=False).values('id', 'title', 'menu_id')
+
+    """
+    [
+        {id:1, title:x1, menu_id:1,children:[]},
+        {id:2, title:x2, menu_id:1,children:[]} ,
+        {id:3, title:x3, menu_id:2,children:[]},
+        {id:4, title:x4, menu_id:2,children:[]},
+    ]
+    """
+    all_second_menu_dict = {}
+    """
+     {
+         1: {id:1, title:x1, menu_id:1,children:[{id:11,title:11,pid:1},]},
+         2: {id:2, title:x2, menu_id:1,children:[]} ,
+         3: {id:3, title:x3, menu_id:2,children:[]},
+         4: {id:4, title:x4, menu_id:2,children:[]},
+     }
+     """
+
+    for row in all_second_menu_list:
+        row['children'] = []  # 用于放三级菜单（具体权限）
+        all_second_menu_dict[row['id']] = row
+        menu_id = row['menu_id']
+        all_menu_dict[menu_id]['children'].append(row)
+
+    # 所有的三级菜单（不能做菜单的权限）
+    all_permission_list = models.Permission.objects.filter(menu__isnull=True).values('id', 'title', 'pid_id')
+    """
+    [
+        {id:11, title:x2,pid:1}, 
+        {id:12, title:x2,pid:1}
+        {id:13, title:x2,pid:2}
+    ]
+    """
+
+    for row in all_permission_list:
+        pid = row['pid_id']
+        if not pid:  # 表示数据不合法，也就是菜单和父权限都没有，那就不处理了
+            continue
+        all_second_menu_dict[pid]['children'].append(row)
+    """
+    [
+        {
+            id:1,
+            title:'业务管理',
+            children:[
+                {
+                    'id':1,
+                    title:'账单列表',
+                    children:[
+                        {'id':12, 'title':'添加账单'}
+                    ]
+                },
+                {'id':11, 'title':'客户列表'},
+            ]
+        },
+    ]
+    """
+
+    print(all_menu_list)
+
+    context = {
+        'user_list': user_list,
+        'role_list': all_role_list,
+    }
+
+    return render(request, 'rbac/distribute_permissions.html', context=context)

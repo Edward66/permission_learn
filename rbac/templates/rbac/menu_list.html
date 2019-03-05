@@ -118,28 +118,25 @@
                 <div class="panel-heading">
                     <i class="fa fa-flag" aria-hidden="true">权限</i>
 
-                    {% if menu_id %}
 
-                        <div class="btn-group right">
-                            {% if second_menu_id %}
+                    <div class="btn-group right">
+                        {% if second_menu_id %}
 
-                                <a href="{% memory_url request 'rbac:permission_add' second_menu_id=second_menu_id %}"
-                                   class="right btn btn-success btn-xs"
-                                   style="padding: 2px 8px;margin:-3px">
-                                    <i class="fa fa-plus-circle" aria-hidden="true">新建</i>
-                                </a>
+                            <a href="{% memory_url request 'rbac:permission_add' second_menu_id=second_menu_id %}"
+                               class="right btn btn-success btn-xs"
+                               style="padding: 2px 8px;margin:-3px">
+                                <i class="fa fa-plus-circle" aria-hidden="true">新建</i>
+                            </a>
+                        {% endif %}
 
-                                <a href="{% memory_url request 'rbac:multi_permissions' %}"
-                                   class="btn right btn-primary btn-xs"
-                                   style="padding: 2px 8px;margin:-3px">
-                                    <i class="fa fa-plus-circle" aria-hidden="true">批量操作</i>
-                                </a>
+                        <a href="{% memory_url request 'rbac:multi_permissions' %}"
+                           class="btn right btn-primary btn-xs"
+                           style="padding: 2px 8px;margin:-3px">
+                            <i class="fa fa-plus-circle" aria-hidden="true">批量操作</i>
+                        </a>
 
-                                </div>
+                    </div>
 
-                            {% endif %}
-
-                    {% endif %}
 
                     <!-- Table -->
                     <table class="table">
@@ -179,6 +176,7 @@
             </div>
 
         </div>
+    </div>
 
 
 {% endblock content %}
