@@ -374,6 +374,19 @@ def distribute_permissions(request):
     if not role_object:
         role_id = None
 
+    if request.method == 'POST' and request.POST.get('type') == 'role':
+        role_id_list = request.POST.getlist('roles')
+        # 用户和角色的关系添加到第三张表（关系表）
+        if not user_object:
+            return HttpResponse('请选择用户，然后再分配角色！')  # 一般人不会进行到这一步操作，技术人员会
+        user_object.roles.set(role_id_list)
+
+    if request.method == 'POST' and request.POST.get('type') == 'permission':
+        permission_id_list = request.POST.getlist('permissions')
+        if not role_object:
+            return HttpResponse('请选择角色然后再分配权限！')
+        role_object.permissions.set(permission_id_list)
+
     # 获取当前用户拥有的所有角色
     if user_id:
         user_has_roles = user_object.roles.all()
