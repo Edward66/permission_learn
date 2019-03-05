@@ -447,11 +447,10 @@ def distribute_permissions(request):
     ]
     """
 
-    print(all_menu_list)
-
     context = {
         'user_list': user_list,
         'role_list': all_role_list,
+        'all_menu_list': all_menu_list,
     }
 
     return render(request, 'rbac/distribute_permissions.html', context=context)

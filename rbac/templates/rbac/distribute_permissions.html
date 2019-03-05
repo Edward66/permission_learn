@@ -3,8 +3,93 @@
 
 {% block css %}
     <style>
-        tr.active {
+        table {
+            font-size: 12px;
+        }
+
+        .user-area ul {
+            padding-left: 20px;
+        }
+
+        .user-area li {
+            cursor: pointer;
+            padding: 2px 0;
+        }
+
+        .user-area li a {
+            display: block;
+        }
+
+        .user-area li.active {
+            font-weight: bold;
+            color: red;
+        }
+
+        .user-area li.active a {
+            color: red;
+        }
+
+        .role-area tr td a {
+            display: block;
+        }
+
+        .role-area tr.active {
+            background-color: #f1f7fd;
             border-left: 3px solid #fdc00f;
+        }
+
+        .panel-body {
+            font-size: 12px;
+        }
+
+        .permission-area tr.root {
+            background-color: #f1f7fd;
+        }
+
+        .permission-area tr.root td i {
+            margin: 3px;
+        }
+
+        .permission-area .node {
+
+        }
+
+        .permission-area .node input[type='checkbox'] {
+            margin: 0 5px;
+        }
+
+        .permission-area .node .parent {
+            padding: 5px 0;
+        }
+
+        .permission-area .node label {
+            font-weight: normal;
+            margin-bottom: 0;
+            font-size: 12px;
+        }
+
+        .permission-area .node .children {
+            padding: 0 0 0 20px;
+        }
+
+        .permission-area .node .children .child {
+            display: inline-block;
+            margin: 2px 5px;
+        }
+
+        .select-help {
+            float: right;
+        }
+
+        .select-help label {
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .select-help .check-all {
+            float: left;
+            display: inline-block;
+            margin-right: 8px;
         }
     </style>
 {% endblock css %}
@@ -54,7 +139,7 @@
                         <tr>
                             <td>{{ role.title }}</td>
                             <td>
-                                <input type="checkbox" name="roles" value="{{ row.id }}" />
+                                <input type="checkbox" name="roles" value="{{ row.id }}"/>
                             </td>
                         </tr>
                     {% endfor %}
@@ -63,16 +148,63 @@
             </div>
         </div>
 
-        <div class="col-md-5">
+        <div class="col-md-5 permission-area">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
                 <div class="panel-heading">
                     <i class="fa fa-flag" aria-hidden="true">权限分配</i>
                 </div>
 
-                <div class="panel-body">
-                    权限菜单
+                <div class="panel-body" style="color: #d4d4d4;padding:10px  5px;">
+
+                    提示：点击角色后，才能为其分配权限
                 </div>
+                <table class="table">
+                    <tbody>
+                    {% for menu in all_menu_list %}
+                        <tr class="root">
+                            <td>
+                                <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                {{ menu.title }}
+                                <div class="select-help">
+                                    <div class="check-all">
+                                        <label for="check_all_{{ menu.id }}">全选</label>
+                                            <input id="check_all_{{ menu.id }}" type="checkbox">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% if menu.children %}
+                            <tr class="node">
+                                <td>
+                                    {% for second_menu in menu.children %}
+                                        <div class="parent">
+                                            <input type="checkbox" id="permission_{{ second_menu.id }}"
+                                                   name="permissions" value="{{ second_menu.id }}"/>
+                                            <label for="permission_{{ second_menu.id }}">{{ second_menu.title }}（菜单）</label>
+                                        </div>
+                                        <div class="children">
+                                            {% for permission in second_menu.children %}
+                                                <div class="child">
+                                                    <input type="checkbox" id="permission_{{ permission.id }}"
+                                                           name="permissions"
+                                                           value="{{ permission.id }}"/>
+
+                                                    <label for="permission_{{ permission.id }}">{{ permission.title }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+
+                    </tbody>
+
+
+                </table>
+
             </div>
 
         </div>
