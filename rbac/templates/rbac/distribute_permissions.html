@@ -97,7 +97,7 @@
 {% block content %}
     <div class="luffy-container">
 
-        <div class="col-md-3">
+        <div class="col-md-3 user-area">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
                 <div class="panel-heading">
@@ -106,7 +106,8 @@
                 <div class="panel-body">
                     <ul>
                         {% for row in user_list %}
-                            <li>{{ row.name }}</li>
+                            <li class="{% if row.id|safe == user_id %}active{% endif %}"><a
+                                    href="?uid={{ row.id }}">{{ row.name }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -114,11 +115,18 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
                 <div class="panel-heading">
                     <i class="fa fa-flag" aria-hidden="true">角色信息</i>
+                    {% if user_id %}
+                        <a href="#"
+                           class="right btn btn-success btn-xs"
+                           style="padding: 2px 8px;margin:-3px">
+                            <i class="fa fa-plus-circle" aria-hidden="true">保存</i>
+                        </a>
+                    {% endif %}
                     <div class="panel-body">
                         提示：点击用户
                     </div>
@@ -139,7 +147,8 @@
                         <tr>
                             <td>{{ role.title }}</td>
                             <td>
-                                <input type="checkbox" name="roles" value="{{ row.id }}"/>
+                                <input type="checkbox" name="roles" value="{{ row.id }}"
+                                       {% if role.id in user_has_roles_dict %}checked{% endif %}/>
                             </td>
                         </tr>
                     {% endfor %}
@@ -148,7 +157,7 @@
             </div>
         </div>
 
-        <div class="col-md-5 permission-area">
+        <div class="col-md-6 permission-area">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
                 <div class="panel-heading">
@@ -169,7 +178,7 @@
                                 <div class="select-help">
                                     <div class="check-all">
                                         <label for="check_all_{{ menu.id }}">全选</label>
-                                            <input id="check_all_{{ menu.id }}" type="checkbox">
+                                        <input id="check_all_{{ menu.id }}" type="checkbox">
                                     </div>
                                 </div>
                             </td>
@@ -180,7 +189,9 @@
                                     {% for second_menu in menu.children %}
                                         <div class="parent">
                                             <input type="checkbox" id="permission_{{ second_menu.id }}"
-                                                   name="permissions" value="{{ second_menu.id }}"/>
+                                                   name="permissions"
+                                                   value="{{ second_menu.id }}"
+                                                   {% if second_menu.id in user_has_permissions_dict %}checked{% endif %}/>
                                             <label for="permission_{{ second_menu.id }}">{{ second_menu.title }}（菜单）</label>
                                         </div>
                                         <div class="children">
@@ -188,7 +199,8 @@
                                                 <div class="child">
                                                     <input type="checkbox" id="permission_{{ permission.id }}"
                                                            name="permissions"
-                                                           value="{{ permission.id }}"/>
+                                                           value="{{ permission.id }}"
+                                                           {% if permission.id in user_has_permissions_dict %}checked{% endif %}/>
 
                                                     <label for="permission_{{ permission.id }}">{{ permission.title }}</label>
                                                 </div>

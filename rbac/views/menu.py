@@ -361,10 +361,37 @@ def distribute_permissions(request):
     :param request:
     :return:
     """
+
+    user_id = request.GET.get('uid')
+    user_object = models.UserInfo.objects.filter(id=user_id).first()
+
+    if not user_object:
+        user_id = None
+
+    # 获取当前用户拥有的所有角色
+    if user_id:
+        user_has_roles = user_object.roles.all()
+    else:
+        user_has_roles = []
+    user_has_roles_dict = {item.id: None for item in user_has_roles}  # 字典查找速度更快
+    """
+        {
+            1:None,
+            2:None,
+            3:None
+        }
+    """
+    # 获取当前用户拥有的所有权限
+    if user_id:
+        user_has_permissions = user_object.roles.filter(permissions__id__isnull=False).values(
+            'id',
+            'permissions').distinct()
+    else:
+        user_has_permissions = []
+    user_has_permissions_dict = {item['permissions']: None for item in user_has_permissions}
+
     user_list = models.UserInfo.objects.all()
     all_role_list = models.Role.objects.all()
-
-    menu_permission_list = []
 
     # 所有的一级菜单
     all_menu_list = models.Menu.objects.all().values('id', 'title')
@@ -451,6 +478,9 @@ def distribute_permissions(request):
         'user_list': user_list,
         'role_list': all_role_list,
         'all_menu_list': all_menu_list,
+        'user_id': user_id,
+        'user_has_roles_dict': user_has_roles_dict,
+        'user_has_permissions_dict': user_has_permissions_dict,
     }
 
     return render(request, 'rbac/distribute_permissions.html', context=context)
