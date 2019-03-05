@@ -115,7 +115,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 role-area">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
                 <div class="panel-heading">
@@ -144,8 +144,14 @@
                     </thead>
                     <tbody>
                     {% for role in role_list %}
-                        <tr>
-                            <td>{{ role.title }}</td>
+                        <tr class="{% if role.id|safe == role_id %}active{% endif %}">
+                            <td>
+                                {% if user_id %}
+                                    <a href="?uid={{ user_id }}&rid={{ role.id }}">{{ role.title }}</a>
+                                {% else %}
+                                    <a href="?rid={{ role.id }}">{{ role.title }}</a>
+                                {% endif %}
+                            </td>
                             <td>
                                 <input type="checkbox" name="roles" value="{{ row.id }}"
                                        {% if role.id in user_has_roles_dict %}checked{% endif %}/>
@@ -162,7 +168,15 @@
                 <!-- Default panel contents -->
                 <div class="panel-heading">
                     <i class="fa fa-flag" aria-hidden="true">权限分配</i>
+                    {% if role_id %}
+                        <a href="#"
+                           class="right btn btn-success btn-xs"
+                           style="padding: 2px 8px;margin:-3px">
+                            <i class="fa fa-plus-circle" aria-hidden="true">保存</i>
+                        </a>
+                    {% endif %}
                 </div>
+
 
                 <div class="panel-body" style="color: #d4d4d4;padding:10px  5px;">
 

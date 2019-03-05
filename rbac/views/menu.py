@@ -368,6 +368,12 @@ def distribute_permissions(request):
     if not user_object:
         user_id = None
 
+    role_id = request.GET.get('rid')
+    role_object = models.Role.objects.filter(id=role_id).first()
+
+    if not role_object:
+        role_id = None
+
     # 获取当前用户拥有的所有角色
     if user_id:
         user_has_roles = user_object.roles.all()
@@ -382,13 +388,18 @@ def distribute_permissions(request):
         }
     """
     # 获取当前用户拥有的所有权限
-    if user_id:
-        user_has_permissions = user_object.roles.filter(permissions__id__isnull=False).values(
-            'id',
-            'permissions').distinct()
+
+    # 如果选中了角色，优先显示选中角色所拥有的权限
+    # 如果没有选角色，才显示用户所拥有的权限
+    if role_object:  # 选择了角色
+        user_has_permissions = role_object.permissions.all()
+        user_has_permissions_dict = {item.id: None for item in user_has_permissions}
+    elif user_object:  # 未选择角色，但选择了用户
+        user_has_permissions = user_object.roles.filter(permissions__id__isnull=False).values('id',
+                                                                                              'permissions').distinct()
+        user_has_permissions_dict = {item['permissions']: None for item in user_has_permissions}
     else:
-        user_has_permissions = []
-    user_has_permissions_dict = {item['permissions']: None for item in user_has_permissions}
+        user_has_permissions_dict = {}
 
     user_list = models.UserInfo.objects.all()
     all_role_list = models.Role.objects.all()
@@ -481,6 +492,7 @@ def distribute_permissions(request):
         'user_id': user_id,
         'user_has_roles_dict': user_has_roles_dict,
         'user_has_permissions_dict': user_has_permissions_dict,
+        'role_id': role_id,
     }
 
     return render(request, 'rbac/distribute_permissions.html', context=context)
