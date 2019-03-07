@@ -2,7 +2,12 @@ from django import forms
 
 from rbac.models import UserInfo
 
-from .base import BaseBootStrapForm
+
+class BaseBootStrapForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(BaseBootStrapForm, self).__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
 
 class LoginForm(BaseBootStrapForm):

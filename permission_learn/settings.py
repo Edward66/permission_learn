@@ -34,10 +34,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # 静态文件
 
     'rbac.apps.RbacConfig',
-    'web.apps.WebConfig'
+    'web.apps.WebConfig',
+
+    'rbac.templatetags', # 自定义标签
 ]
 
 MIDDLEWARE = [
@@ -128,4 +130,6 @@ STATICFILES_DIRS = [
 PERMISSION_SESSION_KEY = 'permission_url_list_key'
 WHITE_LIST = ['/login/', '/admin/.*']
 
+# 一级菜单
+MENU_SESSION_KEY = 'permission_menu_key'
 
