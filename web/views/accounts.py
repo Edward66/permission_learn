@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from web.forms.accounts import LoginForm
 from rbac import models
+from rbac.service.init_permission import init_permission
 
 
 def login(request):
@@ -16,14 +17,7 @@ def login(request):
         password = request.POST.get('password')
         current_user = models.UserInfo.objects.filter(name=username, password=password).first()
 
-        permission_queryset = current_user.roles.filter(permissions__isnull=False).values(
-            'permissions__id',
-            'permissions__url'
-        ).distinct()
-
-        permission_list = [item['permissions__url'] for item in permission_queryset]
-
-        request.session['permission_url_list_key'] = permission_list
+        init_permission(current_user, request)
 
         return redirect('/customer/list/')
 
