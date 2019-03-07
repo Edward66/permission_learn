@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.css">
+</head>
+
+<body>
+
+<div class="container" style="margin:0 auto;margin-top:100px;width:500px;">
+    <form action="{% url 'web:login' %}" method="post" novalidate>
+        {% csrf_token %}
+        {% for field in forms %}
+            <div class="form-group">
+
+                <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                {{ field }}
+                <span class="pull-right" style="color:red;">{{ field.errors }}</span>
+                <span class="pull-right" style="color:red;">{{ errors.0 }}</span>
+
+            </div>
+        {% endfor %}
+        <input type="submit" value="登陆" class="btn btn-primary">
+    </form>
+
+</div>
+
+</body>
+</html>
