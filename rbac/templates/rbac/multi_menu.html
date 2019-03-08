@@ -1,15 +1,15 @@
 <div class="multi-menu">
-    {% for item in second_menu.values %}
+    {% for menu in menus.values %}
         <div class="item">
             <div class="title">
         <span class="icon-wrap">
-            <i class="fa {{ item.icon }}"></i>
+            <i class="fa {{ menu.icon }}"></i>
         </span>
-                {{ item.title }}
+                {{ menu.title }}
             </div>
-            <div class="body {{ item.class }}">
-                {% for permission in item.children %}
-                    <a href="{{ permission.url }}" class="{{ permission.class }}">{{ permission.title }}</a>
+            <div class="body {{ menu.class }}">
+                {% for second_menu in menu.second_menu%}
+                    <a href="{{ second_menu.url }}" class="{{ second_menu.class }}">{{ second_menu.title }}</a>
                 {% endfor %}
             </div>
         </div>

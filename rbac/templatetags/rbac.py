@@ -36,25 +36,24 @@ def menu(request):
 def multi_menu(request):
     menu_dict = request.session[settings.MENU_SESSION_KEY]
 
-    # 对字典的key进行排序。得到的结果是只包含Key的列表，类似这样的 [1,2,3]
     key_list = sorted(menu_dict)
 
-    # 空的有序字典
-    ordered_dict = OrderedDict()  # 有序字典，按照我们想要的顺序展示
-    current_path = request.path
-    for key in key_list:
-        second_menu = menu_dict[key]  # {'title':'客户管理','icon':'fa fa-book','children':[二级菜单1,二级菜单2,...]}
-        second_menu['class'] = 'hide'  # 隐藏二级菜单
-        for permission in second_menu['children']:
-            regex = '^%s$' % (permission['url'])
-            if re.match(regex, current_path):
-                permission['class'] = 'active'
-                second_menu['class'] = ''  # 显示点中的二级菜单
+    ordered_dict = OrderedDict()
 
-        ordered_dict[key] = second_menu
+    for key in key_list:
+        menu = menu_dict[key]
+
+        menu['class'] = 'hide'
+
+        for second_menu in menu['second_menu']:
+            if second_menu['id'] == request.current_selected_permission:
+                second_menu['class'] = 'active'
+                menu['class'] = ''
+
+        ordered_dict[key] = menu
 
     context = {
-        'second_menu': ordered_dict
+        'menus': ordered_dict
     }
 
     return context
