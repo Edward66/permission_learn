@@ -23,7 +23,7 @@ class RbacMiddleware(MiddlewareMixin):
 
         for url in permission_list:
             reg = '^%s$' % url
-            if re.match(url, current_path):
+            if re.match(reg, current_path):
                 has_permission = True
                 break
 
