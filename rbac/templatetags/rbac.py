@@ -42,6 +42,7 @@ def multi_menu(request):
 
     for key in key_list:
         menu = menu_dict[key]
+        print(menu)
 
         menu['class'] = 'hide'
 
@@ -57,3 +58,16 @@ def multi_menu(request):
     }
 
     return context
+
+
+@register.inclusion_tag('rbac/breadcrumb.html')
+def breadcrumb(request):
+    return {'record_list': request.breadcrumb}
+
+
+@register.filter()
+def has_permission(request, name):
+    """判断是否有权限"""
+
+    if name in request.session[settings.PERMISSION_SESSION_KEY]:
+        return True

@@ -8,7 +8,7 @@
                 {{ menu.title }}
             </div>
             <div class="body {{ menu.class }}">
-                {% for second_menu in menu.second_menu%}
+                {% for second_menu in menu.second_menu %}
                     <a href="{{ second_menu.url }}" class="{{ second_menu.class }}">{{ second_menu.title }}</a>
                 {% endfor %}
             </div>
