@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, re_path, include
 from web.views import customer
 from web.views import payment
 from web.views import accounts
@@ -19,5 +19,7 @@ urlpatterns = [
 
     # 登陆
     url(r'login/$', accounts.login, name='login'),
+
+
 
 ]

@@ -27,7 +27,6 @@ class LoginForm(BaseBootStrapForm):
 
         if input_username and input_password:
             user_obj = UserInfo.objects.filter(name=input_username, password=input_password).first()
-            print(user_obj)
             if not user_obj:
                 raise forms.ValidationError('用户名或密码错误')
             else:

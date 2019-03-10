@@ -17,10 +17,9 @@
                 <label for="{{ field.auto_id }}">{{ field.label }}</label>
                 {{ field }}
                 <span class="pull-right" style="color:red;">{{ field.errors }}</span>
-                <span class="pull-right" style="color:red;">{{ errors.0 }}</span>
-
             </div>
         {% endfor %}
+        <span class="pull-right" style="color:red;">{{ errors.0 }}</span>
         <input type="submit" value="登陆" class="btn btn-primary">
     </form>
 
