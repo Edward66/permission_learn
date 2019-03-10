@@ -2,8 +2,7 @@
 角色管理
 """
 
-from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.shortcuts import HttpResponse, render, redirect, reverse
 
 from rbac import models
 from rbac.forms.roles import RoleModelForm
@@ -44,6 +43,10 @@ def role_edit(request, pk):
     :return:
     """
     role_obj = models.Role.objects.filter(id=pk).first()
+
+    if not role_obj:
+        return HttpResponse('角色不存在')
+
     if request.method == 'GET':
         forms = RoleModelForm(instance=role_obj)
         return render(request, 'rbac/change.html', {'forms': forms})
