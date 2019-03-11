@@ -2,6 +2,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 
 from rbac import models
+from rbac.forms.base import BaseBootStrapForm
 
 ICON_LIST = [
     ['fa-hand-scissors-o', '<i aria-hidden="true" class="fa fa-hand-scissors-o"></i>'],
@@ -58,3 +59,15 @@ class MenuModelForm(forms.ModelForm):
                 attrs={'class': 'clearfix'}
             )
         }
+
+
+class SecondMenuModelForm(BaseBootStrapForm):
+    class Meta:
+        model = models.Permission
+        exclude = ['pid']
+
+
+class PermissionModelForm(BaseBootStrapForm):
+    class Meta:
+        model = models.Permission
+        fields = ['title', 'name', 'url']
