@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponse, render, redirect, reverse
 from rbac import models
 from rbac.forms.menu import MenuModelForm, SecondMenuModelForm, PermissionModelForm
 from rbac.service.urls import memory_reverse
+from rbac.service.router import get_all_url_dict
 
 
 def menu_list(request):
@@ -234,3 +235,17 @@ def permission_del(request, pk):
     models.Permission.objects.filter(id=pk).delete()
 
     return redirect(menu_list_url)
+
+
+def multi_permissions(request):
+    """
+    批量操作权限
+    :param request:
+    :return:
+    """
+
+    # 获取项目中所有的url
+
+    all_url_dict = get_all_url_dict()
+
+    return HttpResponse('ok it')
