@@ -100,9 +100,11 @@ class MultiAddPermissionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['menu_id'].choices = models.Menu.objects.all().values_list('id', 'title')
-        self.fields['pid_id'].choices = models.Permission.objects.filter(pid__isnull=True).exclude(
+        self.fields['menu_id'].choices += models.Menu.objects.all().values_list('id', 'title')
+        self.fields['pid_id'].choices += models.Permission.objects.filter(pid__isnull=True).exclude(
             menu__isnull=True).values_list('id', 'title')
+
+
 
 
 class MultiEditPermissionForm(forms.Form):
@@ -137,4 +139,4 @@ class MultiEditPermissionForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['menu_id'].choices += models.Menu.objects.values_list('id', 'title')
         self.fields['pid_id'].choices += models.Permission.objects.filter(pid__isnull=True).exclude(
-            menu__isnull=True).values_list('id', 'title')
+            menu__isnull=True).values_list('id', 'title')  # 是二级菜单，不能没有一级菜单

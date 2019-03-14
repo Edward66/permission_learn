@@ -250,6 +250,58 @@ def multi_permissions(request):
     :return:
     """
 
+    post_type = request.GET.get('type')
+
+    generate_formset_class = formset_factory(MultiAddPermissionForm, extra=0)
+    update_formset_class = formset_factory(MultiEditPermissionForm, extra=0)
+    generate_formset = None  # 出错了赋值，为了返回给页面错误信息
+    update_formset = None  # 出错了赋值，为了返回给页面错误信息
+
+    # 批量添加
+    if request.method == 'POST' and post_type == 'generate':
+        formset = generate_formset_class(data=request.POST)  # 储存的所有信息，包括html标签
+        if formset.is_valid():
+            has_repeat_error = False
+            permission_obj_list = []
+            url_form_list = formset.cleaned_data
+            for num in range(0, formset.total_form_count()):
+                url_form = url_form_list[num]
+                # 下面的方式和model.Permission.object.create(**row)效果一样,这里用这种方式是为了捕获唯一性错误
+                try:
+                    permission_obj = models.Permission(**url_form)
+                    permission_obj.validate_unique()  # 检查当前对象在数据库是否存在唯一的
+                    permission_obj_list.append(permission_obj)
+                except Exception as e:
+                    formset.errors[num].update(e)  # 把错误信息放到对应的form里面
+                    generate_formset = formset  # 要把用户批量增加时出错的错误信息传给模板
+                    has_repeat_error = True
+
+            if not has_repeat_error:
+                models.Permission.objects.bulk_create(permission_obj_list, batch_size=formset.total_form_count())
+        else:
+            generate_formset = formset  # 出错信息传给模板
+
+    # 批量更新
+
+    if request.method == 'POST' and post_type == 'update':
+        formset = update_formset_class(data=request.POST)
+        if formset.is_valid():
+            url_form_list = formset.cleaned_data
+            for num in range(0, formset.total_form_count()):
+                url_form = url_form_list[num]
+                permission_id = url_form.pop('id')
+                try:
+                    permission_obj = models.Permission.objects.filter(id=permission_id).first()
+                    for key, value in url_form.items():
+                        setattr(permission_obj, key, value)
+                        permission_obj.validate_unique()
+                        permission_obj.save()
+                except Exception as e:
+                    formset.errors[num].update(e)
+                    update_formset = formset  # 要把用户批量更新时出错的错误信息传给模板
+        else:
+            update_formset = formset  # 出错信息传给模板
+
     # 1. 获取项目中所有的url
 
     all_url_dict = get_all_url_dict()
@@ -265,53 +317,68 @@ def multi_permissions(request):
     #
 
     # 2. 获取数据库中所有的url
-    permissions = models.Permission.objects.all().values('id', 'title', 'name', 'url', 'menu_id', 'pid_id')
-    permission_name_set = set()  # 数据库中的set集合
-    permission_dict = OrderedDict()
+    all_db_permissions = models.Permission.objects.all().values('id', 'title', 'name', 'url', 'menu_id', 'pid_id')
+    db_permission_name_set = set()  # 数据库中的set集合
+    db_permission_dict = OrderedDict()
 
-    for permission in permissions:
-        permission_dict[permission['name']] = permission
-        permission_name_set.add(permission['name'])
+    for db_permission in all_db_permissions:
+        db_permission_dict[db_permission[
+            'name']] = db_permission  # {'rbac:menu_list':{'id':1,'title':'角色列表',name:'rbac:role_list',url:'/rbac/role/list'},}
+        db_permission_name_set.add(db_permission['name'])  # {'rbac:menu_list','rbac:menu_add'......}
 
-        """
-           {
-               'rbac:menu_list':{'id':1,'title':'角色列表',name:'rbac:role_list',url:'/rbac/role/list'},
-               ......
-           }
-        """
-
-    for name, value in permission_dict.items():
+    for name, value in db_permission_dict.items():
         router_row_dict = all_url_dict.get(name)  # {'name':'rbac:role_list','url':'/rbac/role/list'},
-        if not router_row_dict:
+        if not router_row_dict:  # 没有别名和url的直接跳过
             continue
-        if value['url'] != router_row_dict['url']:
+        if value['url'] != router_row_dict['url']:  # 数据库里的url和自动发现的url进行对比
             value['url'] = '路由和数据库中的不一致'
+            # 字典里的值和列表里的值用的是同一个内存地址，如果改了字典里的值，列表里相应的值也会被改。
+            # 所以这个操作会修改数据库里url的值为：路由和数据库中的不一致'
 
     # 3. 应该添加、删除和修改的权限
 
     # 3.1 计算出应该添加的name
-    add_name_list = router_name_set - permission_name_set  # 所有路由中的url集合减去数据库中的url      集合
+    if not generate_formset:
+        """
+        如果目标没有通过验证，generate_formset的值就是上面出错了的formset，就不会执行下面的代码，页面就会显示错误信息
+        如果通过验证，就会返回给页面自动发现的数据库中有、路由中没有的url。
+        下面的 if not update_formset同理
+        """
+        generate_name_list = router_name_set - db_permission_name_set
+        generate_formset = generate_formset_class(
+            initial=[add_url for name, add_url in all_url_dict.items() if name in generate_name_list]
+        )
 
-    add_formset_class = formset_factory(MultiAddPermissionForm, extra=0)
-    generate_formset = add_formset_class(
-        initial=[row_dict for name, row_dict in all_url_dict.items() if name in add_name_list]
-    )
+    # 3.2 计算出应该删除的name ： 数据库有，路由中没有
+    delete_url_name_list = db_permission_name_set - router_name_set  # 数据库里的url - 路由中的url
+    delete_url_list = [delete_url_obj for name, delete_url_obj in db_permission_dict.items() if
+                       name in delete_url_name_list]
 
-    # 3.2 计算出应该删除的name
-    delete_name_list = permission_name_set - router_name_set  # 数据库里的url - 路由中的url = 数据库里有，路由中没有
-    delete_row_list = [row_dict for name, row_dict in permission_dict.items() if name in delete_name_list]
-
-    # 3.3 计算出应该更新的name
-    update_name_list = permission_name_set & router_name_set  # 都包含的元素
-    update_formset_class = formset_factory(MultiEditPermissionForm, extra=0)
-    update_formset = update_formset_class(
-        initial=[row_dict for name, row_dict in permission_dict.items() if name in update_name_list]
-    )
+    # 3.3 计算出应该更新的name ：数据库和路由中都有
+    if not update_formset:
+        update_name_list = db_permission_name_set & router_name_set  # 都包含的元素
+        update_formset = update_formset_class(
+            initial=[update_url for name, update_url in db_permission_dict.items() if name in update_name_list]
+        )
 
     context = {
         'generate_formset': generate_formset,
-        'delete_row_list': delete_row_list,
+        'delete_url_list': delete_url_list,
         'update_formset': update_formset,
     }
 
     return render(request, 'rbac/multi_permissions.html', context)
+
+
+def multi_permissions_delete(request, pk):
+    """
+    批量页面的权限删除
+    :param request:
+    :param pk:
+    :return:
+    """
+    multi_pemrission_url = memory_reverse(request, 'rbac:multi_permissions')
+    if request.method == 'GET':
+        return render(request, 'rbac/delete.html', {'cancel': multi_pemrission_url})
+    models.Permission.objects.filter(id=pk).delete()
+    return redirect(multi_pemrission_url)
