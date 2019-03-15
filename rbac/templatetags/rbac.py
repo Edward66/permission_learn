@@ -44,8 +44,6 @@ def multi_menu(request):
 
     for key in key_list:
         menu = menu_dict[key]
-        print(menu)
-
         menu['class'] = 'hide'
 
         for second_menu in menu['second_menu']:

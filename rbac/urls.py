@@ -32,9 +32,12 @@ urlpatterns = [
     # 三级菜单
     re_path(r'^permission/add/(?P<second_menu_id>\d+)/$', menu.permission_add, name='permission_add'),
     re_path(r'^permission/edit/(?P<pk>\d+)/$', menu.permission_edit, name='permission_edit'),
-    re_path(r'^permission/del/(?P<pk>\d+)/$', menu.permission_del),
+    re_path(r'^permission/del/(?P<pk>\d+)/$', menu.permission_del, name='permission_del'),
 
     # 批量操作权限
     re_path(r'^multi/permissions/$', menu.multi_permissions, name='multi_permissions'),  # 自动发现项目中的所有URL
-    re_path(r'^multi/permissions/delete/(?P<pk>\d+)', menu.multi_permissions_delete, name='multi_permissions_delete')
+    re_path(r'^multi/permissions/delete/(?P<pk>\d+)', menu.multi_permissions_delete, name='multi_permissions_delete'),
+
+    # 分配权限
+    re_path(r'^distribute/permissions/$', menu.distribute_permissions, name='distribute_permissions'),
 ]

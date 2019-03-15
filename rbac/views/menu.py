@@ -382,3 +382,123 @@ def multi_permissions_delete(request, pk):
         return render(request, 'rbac/delete.html', {'cancel': multi_pemrission_url})
     models.Permission.objects.filter(id=pk).delete()
     return redirect(multi_pemrission_url)
+
+
+def distribute_permissions(request):
+    """
+    权限分配
+    :param request:
+    :return:
+    """
+
+    user_id = request.GET.get('uid')
+    user_object = models.UserInfo.objects.filter(id=user_id).first()
+
+    if not user_object:
+        user_id = None
+
+    role_id = request.GET.get('rid')
+    role_object = models.Role.objects.filter(id=role_id).first()
+
+    if not role_object:
+        role_id = None
+
+    if request.method == 'POST' and request.POST.get('type') == 'role':
+        role_id_list = request.POST.getlist('roles')
+        # 用户和角色的关系添加到第三张表（关系表）
+        if not user_object:
+            return HttpResponse('请选择用户，然后再分配角色')
+        user_object.roles.set(role_id_list)
+
+    if request.method == 'POST' and request.POST.get('type') == 'permission':
+        permission_id_list = request.POST.getlist('permissions')
+        if not role_object:
+            return HttpResponse('请选择角色然后再分配权限！')
+        role_object.permissions.set(permission_id_list)
+
+    # 获取当前用户拥有的所有角色
+
+    if user_id:
+        user_has_roles = user_object.roles.all()
+    else:
+        user_has_roles = []
+
+    user_has_roles_dict = {item.id: None for item in user_has_roles}  # 字典查找速度更快
+
+    # 获取当前用户拥有的所有权限
+    # 如果选中了角色，优先显示选中角色所拥有的权限
+    # 如果没有选角色，才显示用户所拥有的权限
+
+    if role_object:  # 选择了角色
+        user_has_permissions = role_object.permissions.all()
+        user_has_permissions_dict = {item.id: None for item in user_has_permissions}
+    elif user_object:  # 未选择角色，但是选择了用户
+        user_has_permissions = user_object.roles.filter(permissions__id__isnull=False).values(
+            'id', 'permissions').distinct()
+        user_has_permissions_dict = {item['permissions']: None for item in user_has_permissions}
+    else:
+        user_has_permissions_dict = {}
+
+    user_list = models.UserInfo.objects.all()
+    all_role_list = models.Role.objects.all()
+
+    # 用到的知识点：字典里的值和列表里的值用的是同一个内存地址，如果改了字典里的值，列表里相应的值也会被改。
+
+    # 所有的一级菜单
+    all_menu_list = models.Menu.objects.all().values('id', 'title')
+
+    all_menu_dict = {}
+
+    for menu_obj in all_menu_list:
+        menu_obj['children'] = []  # 用于放二级菜单
+        all_menu_dict[menu_obj['id']] = menu_obj
+
+    # 所有的二级菜单
+    all_second_menu_list = models.Permission.objects.filter(menu__isnull=False).values('id', 'title', 'menu_id')
+
+    all_second_menu_dict = {}
+
+    for second_menu_obj in all_second_menu_list:
+        second_menu_obj['children'] = []  # 用于放三级菜单（具体权限）
+        all_second_menu_dict[second_menu_obj['id']] = second_menu_obj
+        menu_id = second_menu_obj['menu_id']
+        all_menu_dict[menu_id]['children'].append(second_menu_obj)
+
+    # 所有的三级菜单（不能做菜单的权限）
+    all_permission_list = models.Permission.objects.filter(menu__isnull=True).values('id', 'title', 'pid_id')
+
+    for permission_obj in all_permission_list:
+        pid = permission_obj['pid_id']
+        if not pid:  # 表示数据不合法，也就是菜单和父权限都没有，那就不处理了
+            continue
+        all_second_menu_dict[pid]['children'].append(permission_obj)
+
+    """
+      [
+          {
+              id:1,
+              title:'业务管理',
+              children:[
+                  {
+                      'id':1,
+                      title:'账单列表',
+                      children:[
+                          {'id':12, 'title':'添加账单'}
+                      ]
+                  },
+                  {'id':11, 'title':'客户列表'},
+              ]
+          },
+      ]
+          """
+
+    context = {
+        'user_list': user_list,
+        'role_list': all_role_list,
+        'all_menu_list': all_menu_list,
+        'user_id': user_id,
+        'user_has_roles_dict': user_has_roles_dict,
+        'user_has_permissions_dict': user_has_permissions_dict,
+        'role_id': role_id
+    }
+    return render(request, 'rbac/distribute_permissions.html', context)
